@@ -82,8 +82,39 @@ namespace Homies.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Leave(int id)
+        {
+            string userId = GetUserId();
+
+            var eventForLeave = await context.Events
+               .Where(e => e.Id == id)
+               .Include(e => e.EventsParticipants)
+               .FirstOrDefaultAsync();
+
+            if (eventForLeave == null)
+            {
+                return BadRequest();
+            }
+
+            var participant = context.EventsParticipants
+                .FirstOrDefault(p => p.HelperId == userId);
+
+            if (participant == null)
+            {
+                return BadRequest();
+            }
+
+            eventForLeave.EventsParticipants.Remove(participant);
+
+           await context.SaveChangesAsync();
+
+
+            return RedirectToAction(nameof(All));
+        }
+
         [HttpGet]
-        public async Task <IActionResult> Add()
+        public async Task<IActionResult> Add()
         {
             var model = new EventAddViewModel();
             model.Types = await GetTypes();
@@ -91,7 +122,7 @@ namespace Homies.Controllers
             return View(model);
         }
 
-        private async Task <IEnumerable<TypeViewModel>> GetTypes()
+        private async Task<IEnumerable<TypeViewModel>> GetTypes()
         {
             return await context.Types
                 .Select(t => new TypeViewModel()
@@ -104,7 +135,7 @@ namespace Homies.Controllers
 
 
 
-        }       
+        }
 
         private string GetUserId()
         {
