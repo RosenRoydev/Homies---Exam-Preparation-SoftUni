@@ -13,7 +13,7 @@
         public const int TypeNameMinLength = 5;
         public const int TypeNameMaxLength = 15;
 
-        public const string RequiredField = "The field {} is required";
+        public const string RequiredField = "The field {0} is required";
         public const string RequiredLength = "The field must be between {2} and {1} characters";
     }
 }
